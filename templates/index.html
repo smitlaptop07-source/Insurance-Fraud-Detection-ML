@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Fraud Detection</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 30px; font-weight: 800; }
+        .header p { font-size: 14px; color: #aaa; margin-top: 8px; }
+        .card {
+            background: white; border-radius: 20px; padding: 40px;
+            width: 100%; max-width: 800px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+        }
+        .card h2 { font-size: 18px; color: #302b63; margin-bottom: 24px;
+            padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 12px; font-weight: 600; color: #555; margin-bottom: 5px; }
+        input {
+            padding: 10px 12px; border: 2px solid #e8e8e8;
+            border-radius: 8px; font-size: 13px; color: #333; transition: all 0.3s;
+        }
+        input:focus { outline: none; border-color: #302b63; }
+        button {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, #302b63, #e94560);
+            color: white; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 24px;
+            transition: opacity 0.3s;
+        }
+        button:hover { opacity: 0.9; }
+        .result {
+            margin-top: 24px; padding: 18px; border-radius: 12px;
+            text-align: center; font-size: 17px; font-weight: 700;
+        }
+        .result.red { background:#fff0f0; color:#c0392b; border:2px solid #e74c3c; }
+        .result.green { background:#f0fff4; color:#27ae60; border:2px solid #2ecc71; }
+        .result.orange { background:#fff8f0; color:#e67e22; border:2px solid #f39c12; }
+        .footer { color: #888; font-size: 13px; margin-top: 20px; }
+        .section-title { font-size: 13px; font-weight: 700; color: #302b63;
+            margin: 20px 0 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+        .hint { font-size: 11px; color: #999; margin-top: 3px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Insurance Fraud Detection</h1>
+        <p>Powered by Machine Learning | Enter claim details below</p>
+    </div>
+    <div class="card">
+        <h2>📋 Claim Information</h2>
+        <form action="/predict" method="POST">
+
+            <div class="section-title">Policy Details</div>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Policy State</label>
+                    <input type="number" name="policy_state" placeholder="e.g. 0" required>
+                    <span class="hint">0=MH, 1=DL, 2=KA</span>
+                </div>
+                <div class="form-group">
+                    <label>Policy CSL</label>
+                    <input type="number" name="policy_csl" placeholder="e.g. 0" required>
+                    <span class="hint">0, 1, or 2</span>
+                </div>
+                <div class="form-group">
+                    <label>Policy Deductable (₹)</label>
+                    <input type="number" name="policy_deductable" placeholder="e.g. 500" required>
+                </div>
+                <div class="form-group">
+                    <label>Annual Premium (₹)</label>
+                    <input type="number" step="0.01" name="policy_annual_premium" placeholder="e.g. 12000" required>
+                </div>
+                <div class="form-group">
+                    <label>Umbrella Limit</label>
+                    <input type="number" name="umbrella_limit" placeholder="e.g. 0" required>
+                </div>
+                <div class="form-group">
+                    <label>Vehicle Year</label>
+                    <input type="number" name="auto_year" placeholder="e.g. 2018" required>
+                </div>
+            </div>
+
+            <div class="section-title">Insured Person Details</div>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" name="age" placeholder="e.g. 35" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <input type="number" name="insured_sex" placeholder="e.g. 0 or 1" required>
+                    <span class="hint">0=Female, 1=Male</span>
+                </div>
+                <div class="form-group">
+                    <label>Education Level</label>
+                    <input type="number" name="insured_education_level" placeholder="e.g. 2" required>
+                    <span class="hint">0=Below 10th to 4=PG</span>
+                </div>
+                <div class="form-group">
+                    <label>Occupation</label>
+                    <input type="number" name="insured_occupation" placeholder="e.g. 3" required>
+                    <span class="hint">0-10</span>
+                </div>
+                <div class="form-group">
+                    <label>Hobbies</label>
+                    <input type="number" name="insured_hobbies" placeholder="e.g. 5" required>
+                    <span class="hint">0-19</span>
+                </div>
+                <div class="form-group">
+                    <label>Relationship</label>
+                    <input type="number" name="insured_relationship" placeholder="e.g. 1" required>
+                    <span class="hint">0-5</span>
+                </div>
+                <div class="form-group">
+                    <label>Capital Gains (₹)</label>
+                    <input type="number" name="capital_gains" placeholder="e.g. 0" required>
+                </div>
+                <div class="form-group">
+                    <label>Capital Loss (₹)</label>
+                    <input type="number" name="capital_loss" placeholder="e.g. 0" required>
+                </div>
+            </div>
+
+            <div class="section-title">Incident Details</div>
+            <div class="grid">
+                <div class="form-group">
+                    <label>Incident Date (Day)</label>
+                    <input type="number" name="incident_date" placeholder="e.g. 15" required>
+                </div>
+                <div class="form-group">
+                    <label>Incident Type</label>
+                    <input type="number" name="incident_type" placeholder="e.g. 0" required>
+                    <span class="hint">0=Collision, 1=Fire, 2=Theft, 3=Other</span>
+                </div>
+                <div class="form-group">
+                    <label>Collision Type</label>
+                    <input type="number" name="collision_type" placeholder="e.g. 1" required>
+                    <span class="hint">0=Front, 1=Rear, 2=Side</span>
+                </div>
+                <div class="form-group">
+                    <label>Incident Severity</label>
+                    <input type="number" name="incident_severity" placeholder="e.g. 2" required>
+                    <span class="hint">0=Minor, 1=Moderate, 2=Major, 3=Total</span>
+                </div>
+                <div class="form-group">
+                    <label>Authorities Contacted</label>
+                    <input type="number" name="authorities_contacted" placeholder="e.g. 1" required>
+                    <span class="hint">0=None, 1=Police, 2=Fire, 3=Ambulance</span>
+                </div>
+                <div class="form-group">
+                    <label>Incident State</label>
+                    <input type="number" name="incident_state" placeholder="e.g. 2" required>
+                    <span class="hint">0-5</span>
+                </div>
+                <div class="form-group">
+                    <label>Incident City</label>
+                    <input type="number" name="incident_city" placeholder="e.g. 3" required>
+                    <span class="hint">0-6</span>
+                </div>
+                <div class="form-group">
+                    <label>Incident Hour (0-23)</label>
+                    <input type="number" name="incident_hour_of_the_day" placeholder="e.g. 14" required>
+                </div>
+                <div class="form-group">
+                    <label>Vehicles Involved</label>
+                    <input type="number" name="number_of_vehicles_involved" placeholder="e.g. 2" required>
+                </div>
+                <div class="form-group">
+                    <label>Property Damage</label>
+                    <input type="number" name="property_damage" placeholder="e.g. 1" required>
+                    <span class="hint">0=No, 1=Yes</span>
+                </div>
+                <div class="form-group">
+                    <label>Bodily Injuries</label>
+                    <input type="number" name="bodily_injuries" placeholder="e.g. 1" required>
+                </div>
+                <div class="form-group">
+                    <label>Witnesses</label>
+                    <input type="number" name="witnesses" placeholder="e.g. 2" required>
+                </div>
+                <div class="form-group">
+                    <label>Police Report Filed</label>
+                    <input type="number" name="police_report_available" placeholder="e.g. 1" required>
+                    <span class="hint">0=No, 1=Yes</span>
+                </div>
+                <div class="form-group">
+                    <label>Total Claim Amount (₹)</label>
+                    <input type="number" step="0.01" name="total_claim_amount" placeholder="e.g. 500000" required>
+                </div>
+            </div>
+
+            <button type="submit">🔎 Detect Fraud</button>
+        </form>
+
+        {% if prediction_text %}
+        <div class="result {{ color }}">{{ prediction_text }}</div>
+        {% endif %}
+    </div>
+    <div class="footer">Insurance Fraud Detection System — ML Project | India</div>
+</body>
+</html>
